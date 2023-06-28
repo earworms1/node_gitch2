@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>manage page</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.13/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <h1 style="text-align: center;">manage Page</h1>
+    <div id="app">
+        <!-- {{msg}} -->
+        <div class="list">
+            <!-- {{data}} -->
+            <div v-for="item in data"  style="border: 1px solid;border-radius: 5px;padding: 20px;margin: 10px auto;">
+               <div v-for="items in item" style="border: 1px solid;border-radius: 5px;padding: 20px;"> 
+                {{items}}
+               </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                msg: '123',
+                data:[]
+            }
+        },
+        created(){
+    axios.get('http://8.130.19.133:3000/get-array')
+  .then(response => {
+    this.data = response.data
+    console.log(response.data);  // 处理响应数据
+  })
+        }
+    })
+</script>
+
+</html>

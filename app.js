@@ -1,11 +1,14 @@
 
 const express = require('express');
 const fs = require('fs');
+const path=require("path");
 const app = express();
 
 // 解析请求体中的 JSON 数据
 app.use(express.json());
 
+
+app.use(express.static(path.join(__dirname,'public')));
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
