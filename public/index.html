@@ -95,7 +95,50 @@
 <body>
   <div id="app">
     <my-component :song-chosen="songChosen"></my-component>
-    <button style="width: 100px;height: 50px;font-size: 16px;" v-show="count == 0" @click="clickfn()">start</button>
+    
+    <h2 v-show="count == 0" style="margin: 20px auto;text-align: left;">You are invited to participate in a research
+      study which aims to create a test that aligns with your music color personality. In this test, you will be asked
+      to provide some basic information firstly, followed by playing an online music test according to instructions.
+      During and after the music test, you both will answer some questions related to this music test. Ultimately, you
+      will receive a result regarding your music personality. You can tell us whether you agree or not agree the result
+      of your music color personality.</h2>
+    <button style="width: 100px;height: 50px;font-size: 16px;" v-show="count == 0" @click="clickfn()">next</button>
+
+    <div v-show="count == 0.5" style="text-align: left;position: relative;top: -40px;">
+      <h4>Statement </h4>
+      <h4>Voluntary Participation:</h4>
+      <p>Your participation in this study is completely voluntary. You have the right to refuse participation or
+        withdraw from the study at any time without any consequences or negative impact on you. </p>
+      <h4>Confidentiality and Privacy:</h4>
+      <p>Your privacy and the confidentiality of your personal information are of utmost importance. All data collected
+        during this study will be treated confidentially and stored securely. Your personal information will be
+        anonymized, and any identifying information will be removed to ensure your privacy.</p>
+      <h4>Risks and Benefits:</h4>
+      <p>It is important to note that there may be minimal risks associated with participating in this study. These
+        risks include unexpected blast sound from your headphone, experience a website crush or computer forzen.
+        However, there are no anticipated direct benefits to you as a participant. Nevertheless, your participation will
+        contribute to advancing knowledge in the field of music personality.</p>
+      <h4>Contact Information:</h4>
+      <p>If you have any questions or concerns about this study, please feel free to contact the principal investigator,
+        Ran Ji at Rji996@outlook.com.</p>
+      <h4>Informed Consent:</h4>
+      <p>By clicking the "Agree" button below, you acknowledge that:</p>
+      <p>1.You have read the information provided above and understand the purpose, procedures, and potential risks of
+        the study.</p>
+      <p>2.You have had the opportunity to ask questions and have received satisfactory answers.</p>
+      <p>3.You understand that your participation is voluntary, and you have the right to withdraw at any time without
+        penalty.</p>
+      <p>4.You understand that all data collected will be handled confidentially and stored securely.</p>
+      <p>5.You understand that the results of this study may be published, but your personal information will remain
+        anonymous.</p>
+      <p>By clicking the "Agree" button below, you indicate your voluntary consent to participate in this study.</p>
+      <p>Please only proceed with the study if you agree to the terms and conditions outlined in this consent form.</p>
+      <p>Thank you for your participation.</p>
+      <div style="position: fixed;bottom: 20px;right: 30px;">
+        <button @click="clickfn()" style="margin: 0 20px;">Agree</button>
+      <button @click="clickfn()">Disagree</button>
+      </div>
+    </div>
     <div v-show="count == 1">
       <h1>Now you gonna listen to a music piece. After linstening, can you describe the feeling about it?</h1>
 
@@ -106,13 +149,15 @@
         <div id="progress"></div>
       </div>
 
-      <!-- <p id="counter">Clicks: 0</p> -->
+      
+        <!-- <p id="counter">Clicks: 0</p> -->
       <div style="display: flex;flex-direction: column;width: 100vw;align-items: center;justify-content: center;">
-        <button onclick="toggleSong()" style="width: 150px;height: 50px;font-size: 16px;margin-bottom: 10px;">Play
+        <button v-if="tog" onclick="toggleSong()" style="width: 150px;height: 50px;font-size: 16px;margin-bottom: 10px;" id="randomPlay">Play
           Random Song</button>
         <button style="width: 150px;height: 50px;font-size: 16px;position: absolute;bottom: 10px;right: 10px;"
-          v-show="count == 1" @click="clickfn()">next</button>
+          v-show="randomA" @click="clickfn()" id="randomA">next</button>
       </div>
+     
 
 
 
@@ -129,8 +174,8 @@
 
 
     <div v-show="count == 3">
-      <div>
-        <button id="playButton">start play</button>
+      <div style="padding-right: 8vw ;">
+        <button id="playButton" v-show = "play">start play</button>
         <span id="currentTime"></span>
       </div>
    
@@ -141,7 +186,7 @@
       
    <button @click="startTimer">click</button>
       <button style="width: 100px;height: 50px;font-size: 16px;position: absolute;bottom: 10px;right: 10px;"
-        v-show="count == 3" @click="clickfns()">next</button>
+        v-show="videoNext" @click="clickfns()">next</button>
 
     </div>
 
@@ -220,6 +265,10 @@
         }
       },
       data: {
+        tog:true,
+        randomA:false,
+        play:true,
+        videoNext:false,
         message: '欢迎使用Vue.js!',
         selectedIndex: null,
         count: 0,
@@ -571,6 +620,12 @@
             ) // 添加标记插件
           ]
         });
+        this.wavesurfer.on('finish', () => {
+          // 当音频文件加载完成后，执行一些操作
+          console.log('播放完毕');
+          this.videoNext = true
+         
+        });
     
         // 加载音频文件
         this.wavesurfer.load(songs[window.songChosen]);
@@ -579,15 +634,8 @@
         const updateCurrentTime = () => {
           const currentTime = this.wavesurfer.getCurrentTime();
           document.getElementById('currentTime').innerHTML = currentTime.toFixed(2) + 's';
-          // tag
-         
-
-          
-          
-    
           // 在波形图上显示当前播放位置的竖线
           this.wavesurfer.drawer.progress(this.wavesurfer.backend.getPlayedPercents());
-    
           requestAnimationFrame(updateCurrentTime);
         };
         // 添加事件监听器
@@ -605,6 +653,7 @@
         // 控制播放/暂停
         document.getElementById('playButton').addEventListener('click', () => {
           this.wavesurfer.playPause();
+          document.getElementById('playButton').style.opacity = 0
         });
       },
       methods: {
@@ -616,6 +665,10 @@
           this.message = '你好，' + this.name + '!';
         },
         clickfn() {
+          if(this.count <= 0.5){
+            this.count = this.count + 0.5
+            return
+          }
           this.count++
 
           if (this.count === 3) {
@@ -665,7 +718,7 @@
             // console.log(`第${this.index}次${this.hours}时:${this.minutes}分:秒${this.seconds}`);
             
             // let temp = (`第${this.index}次${this.hours}时:${this.minutes}分:秒${this.seconds}`)
-            let temp = ('第' + this.index + '次'+ this.wavesurfer.getCurrentTime().toFixed(2) + 's')
+            let temp = ('click time' + this.index + ' ' + this.wavesurfer.getCurrentTime().toFixed(2) + 's')
             this.index++
             this.list.push(temp)
             console.log(this.list)
@@ -701,6 +754,7 @@
     window.songChosen = 0;
     window.markers = [];
     function toggleSong() {
+     document.getElementById('randomPlay').style.display = 'none'
       if (!audioPlayer.paused) {
         audioPlayer.pause();
         audioPlayer.currentTime = 0;
@@ -713,13 +767,23 @@
         audioPlayer.play();
         updateProgressBar();
       }
+      console.log(123)
+      this.tog = false
+      console.log(this.tog)
     }
 
     function updateProgressBar() {
-      var duration = audioPlayer.duration;
-      var currentTime = audioPlayer.currentTime;
-      var progress = (currentTime / duration) * 100;
-      progressBar.style.width = progress + '%';
+      
+      var duration = audioPlayer.duration
+      var currentTime = audioPlayer.currentTime
+      var progress = (currentTime / duration) * 100
+      progressBar.style.width = progress + '%'
+      console.log(progressBar.style.width)
+      if(progressBar.style.width == '100%'){
+        document.getElementById('randomA').style.display = 'block'
+      }
+      
+      
     }
 
     function resetProgressBar() {
